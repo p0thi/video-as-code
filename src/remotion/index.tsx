@@ -2,6 +2,8 @@ import React from "react";
 import { Composition, registerRoot } from "remotion";
 import { VideoComposition } from "./Composition";
 import type { CompositionProps } from "../types.js";
+import { CompositionPropsSchema } from "../types.js";
+
 
 const calculateDurationInFrames = (props: CompositionProps): number => {
   return props.clips.reduce((total, clip) => {
@@ -11,9 +13,10 @@ const calculateDurationInFrames = (props: CompositionProps): number => {
 
 export const RemotionRoot: React.FC = () => {
   return (
-    <Composition<CompositionProps>
+    <Composition
       id="VideoComposition"
       component={VideoComposition}
+      schema={CompositionPropsSchema}
       durationInFrames={1}
       fps={30}
       width={1920}

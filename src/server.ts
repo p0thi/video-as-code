@@ -2,8 +2,11 @@ import "dotenv/config";
 import { Hono } from "hono";
 import { serve } from "@hono/node-server";
 import { bearerAuth } from "hono/bearer-auth";
-import { createReadStream, unlinkSync, statSync } from "fs";
+import { createReadStream, createWriteStream, unlinkSync, statSync } from "fs";
 import { Readable } from "stream";
+import { finished } from "stream/promises";
+import path from "path";
+import os from "os";
 import { RenderRequestSchema } from "./types.js";
 import { renderVideo } from "./render.js";
 
@@ -21,6 +24,18 @@ const app = new Hono();
 app.get("/health", (c) => {
   return c.json({ status: "ok" });
 });
+
+async function downloadClip(url: string): Promise<string> {
+  const dest = path.join(os.tmpdir(), `input-${Date.now()}-${Math.floor(Math.random() * 1000)}.mp4`);
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Failed to fetch ${url}: ${res.statusText}`);
+  if (!res.body) throw new Error(`No body in response for ${url}`);
+  const fileStream = createWriteStream(dest);
+  
+  // @ts-ignore - Readable.fromWeb expects a Node.js web stream wrapper
+  await finished(Readable.fromWeb(res.body).pipe(fileStream));
+  return dest;
+}
 
 app.post("/render", bearerAuth({ token: API_TOKEN }), async (c) => {
   // Parse and validate request body
@@ -51,8 +66,25 @@ app.post("/render", bearerAuth({ token: API_TOKEN }), async (c) => {
     `Rendering ${request.clips.length} clip(s) at ${request.fps}fps, ${request.width}x${request.height}`
   );
 
+  const downloadedFiles: string[] = [];
+
   try {
-    const outputPath = await renderVideo(request);
+    console.log("Downloading clips locally...");
+    const localClips = await Promise.all(
+      request.clips.map(async (clip) => {
+        console.log(`Downloading ${clip.url}...`);
+        const localPath = await downloadClip(clip.url);
+        downloadedFiles.push(localPath);
+        return {
+          ...clip,
+          url: `file://${localPath}`,
+        };
+      })
+    );
+
+    const localRequest = { ...request, clips: localClips };
+    const outputPath = await renderVideo(localRequest);
+    downloadedFiles.push(outputPath);
 
     // Stream the file back
     const stat = statSync(outputPath);
@@ -63,11 +95,13 @@ app.post("/render", bearerAuth({ token: API_TOKEN }), async (c) => {
 
     // Clean up temp file after streaming
     readStream.on("close", () => {
-      try {
-        unlinkSync(outputPath);
-        console.log("Cleaned up temp file:", outputPath);
-      } catch {
-        // Ignore cleanup errors
+      for (const file of downloadedFiles) {
+        try {
+          unlinkSync(file);
+          console.log("Cleaned up temp file:", file);
+        } catch {
+          // Ignore cleanup errors
+        }
       }
     });
 
@@ -80,6 +114,15 @@ app.post("/render", bearerAuth({ token: API_TOKEN }), async (c) => {
       },
     });
   } catch (error) {
+    for (const file of downloadedFiles) {
+      try {
+        unlinkSync(file);
+        console.log("Cleaned up temp file after error:", file);
+      } catch {
+        // Ignore
+      }
+    }
+
     console.error("Render failed:", error);
     return c.json(
       {

@@ -52,6 +52,9 @@ export async function renderVideo(request: RenderRequest): Promise<string> {
     codec: "h264",
     outputLocation: outputPath,
     inputProps,
+    chromiumOptions: {
+      disableWebSecurity: true,
+    },
     onProgress: ({ progress }) => {
       if (Math.round(progress * 100) % 10 === 0) {
         console.log(`Render progress: ${Math.round(progress * 100)}%`);

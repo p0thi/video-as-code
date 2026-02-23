@@ -21,7 +21,10 @@ export const RenderRequestSchema = z
 export type Clip = z.infer<typeof ClipSchema>;
 export type RenderRequest = z.infer<typeof RenderRequestSchema>;
 
-export interface CompositionProps {
-  clips: Clip[];
-  fps: number;
-}
+export const CompositionPropsSchema = z.object({
+  clips: z.array(ClipSchema),
+  fps: z.number(),
+});
+
+export type CompositionProps = z.infer<typeof CompositionPropsSchema>;
+

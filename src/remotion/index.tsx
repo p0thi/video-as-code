@@ -1,8 +1,8 @@
 import React from "react";
 import { Composition, registerRoot } from "remotion";
 import { VideoComposition } from "./Composition";
-import type { CompositionProps } from "../types.js";
-import { CompositionPropsSchema } from "../types.js";
+import type { CompositionProps } from "../types";
+import { CompositionPropsSchema } from "../types";
 
 
 const calculateDurationInFrames = (props: CompositionProps): number => {

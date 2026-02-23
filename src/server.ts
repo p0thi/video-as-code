@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { Hono } from "hono";
 import { serve } from "@hono/node-server";
+import { serveStatic } from "@hono/node-server/serve-static";
 import { bearerAuth } from "hono/bearer-auth";
 import { createReadStream, createWriteStream, unlinkSync, statSync } from "fs";
 import { Readable } from "stream";
@@ -24,6 +25,9 @@ const app = new Hono();
 app.get("/health", (c) => {
   return c.json({ status: "ok" });
 });
+
+app.use('/temp-assets/*', serveStatic({ root: os.tmpdir(), rewriteRequestPath: (p) => p.replace(/^\/temp-assets/, '') }));
+
 
 async function downloadClip(url: string): Promise<string> {
   const dest = path.join(os.tmpdir(), `input-${Date.now()}-${Math.floor(Math.random() * 1000)}.mp4`);
@@ -75,9 +79,11 @@ app.post("/render", bearerAuth({ token: API_TOKEN }), async (c) => {
         console.log(`Downloading ${clip.url}...`);
         const localPath = await downloadClip(clip.url);
         downloadedFiles.push(localPath);
+        const filename = path.basename(localPath);
+        const port = parseInt(process.env.PORT || "3000", 10);
         return {
           ...clip,
-          url: `file://${localPath}`,
+          url: `http://localhost:${port}/temp-assets/${filename}`,
         };
       })
     );

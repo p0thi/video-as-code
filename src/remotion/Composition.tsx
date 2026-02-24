@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill, Series, Html5Video } from "remotion";
+import { AbsoluteFill, Series, OffthreadVideo } from "remotion";
 import type { CompositionProps } from "../types";
 
 export const VideoComposition: React.FC<CompositionProps> = ({ clips, fps }) => {
@@ -14,7 +14,7 @@ export const VideoComposition: React.FC<CompositionProps> = ({ clips, fps }) => 
           return (
             <Series.Sequence key={index} durationInFrames={durationInFrames}>
               <AbsoluteFill>
-                <Html5Video
+                <OffthreadVideo
                   src={clip.url}
                   trimBefore={startFrame}
                   trimAfter={endFrame}

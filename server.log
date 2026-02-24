@@ -1,0 +1,58 @@
+Starting video-as-code server on port 3000...
+Server running at http://localhost:3000
+Processing payload for 1 clip(s) at 30fps, 1920x1080
+Fetching metadata for https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4...
+Internal ffprobe failed, trying system ffprobe fallback...
+Creating Remotion bundle...
+Bundle created at: /var/folders/qm/_v9kwc6n4t35wc95vncmcrgh0000gn/T/remotion-webpack-bundle-ihy3tY
+Selecting composition...
+Rendering video to: /var/folders/qm/_v9kwc6n4t35wc95vncmcrgh0000gn/T/video-as-code-1771964719132.mp4
+Render progress: 0%
+Render progress: 0%
+Render progress: 0%
+Render progress: 0%
+Render progress: 10%
+Render progress: 10%
+Render progress: 10%
+Render progress: 10%
+Render progress: 10%
+Render progress: 10%
+Render progress: 20%
+Render progress: 20%
+Render progress: 20%
+Render progress: 20%
+Render progress: 20%
+Render progress: 20%
+Render progress: 20%
+Render progress: 30%
+Render progress: 30%
+Render progress: 30%
+Render progress: 30%
+Render progress: 30%
+Render progress: 30%
+Render progress: 40%
+Render progress: 40%
+Render progress: 40%
+Render progress: 40%
+Render progress: 40%
+Render progress: 40%
+Render progress: 50%
+Render progress: 50%
+Render progress: 50%
+Render progress: 50%
+Render progress: 50%
+Render progress: 50%
+Render progress: 50%
+Render progress: 60%
+Render progress: 60%
+Render progress: 60%
+Render progress: 60%
+Render progress: 60%
+Render progress: 60%
+Render progress: 70%
+Render progress: 70%
+Render progress: 70%
+Render progress: 70%
+Render progress: 80%
+Render progress: 100%
+Render complete: /var/folders/qm/_v9kwc6n4t35wc95vncmcrgh0000gn/T/video-as-code-1771964719132.mp4
